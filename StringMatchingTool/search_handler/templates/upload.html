@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Files</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('upload-form');
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                const formData = new FormData(form);
+
+                try {
+                    const response = await fetch('/upload/', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
+                        }
+                    });
+
+                    const result = await response.json();
+                    const resultsId = result.results_id;
+                    const query = result.query;
+                    console.log(resultsId)
+                    console.log(query)
+                    // Redirect to results page
+                    window.location.href = `/results/${resultsId}/${query}/`;
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Upload Files and Enter Query</h1>
+    <form id="upload-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="files" multiple />
+        <input type="text" name="query" placeholder="Enter query string" required />
+        <button type="submit">Upload and Process</button>
+    </form>
+</body>
+</html>

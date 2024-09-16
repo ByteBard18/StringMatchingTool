@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Processing Results</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const resultsId = "{{ results_id }}";  // Get the results ID
+
+            async function fetchResults() {
+                try {
+                    const response = await fetch(`/results/${resultsId}/`);  // Fetch results from the endpoint
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    
+                    const data = await response.json();
+                    console.log(data);
+
+                    const resultsContainer = document.getElementById('results-container');
+                    data.forEach(result => {
+                        const resultElement = document.createElement('div');
+                        resultElement.textContent = `ID: ${result.id}, Content: ${result.content}`;
+                        resultsContainer.appendChild(resultElement);
+                    });
+                } catch (error) {
+                    console.error('Error fetching results:', error);
+                }
+            }
+
+            fetchResults();
+        });
+    </script>
+</head>
+<body>
+    <h1>Processing Results</h1>
+    <h2>Generated JSON Array:</h2>
+    <div id="results-container"></div>
+</body>
+</html>
