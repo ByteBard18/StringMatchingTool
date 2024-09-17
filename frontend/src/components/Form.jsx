@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './Form.module.css'; // Import the CSS module
 
 const Form = () => {
@@ -6,7 +7,7 @@ const Form = () => {
     const [query, setQuery] = useState('');
     const [loading, setLoading] = useState(false);
     const [csrfToken, setCsrfToken] = useState('');
-
+    const navigate = useNavigate();
     // Function to handle file selection
     const handleFileChange = (event) => {
         setFiles(event.target.files);
@@ -18,10 +19,10 @@ const Form = () => {
     };
 
     // Fetch CSRF token from a meta tag or other source
-    useEffect(() => {
-        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        setCsrfToken(token);
-    }, []);
+    // useEffect(() => {
+    //     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    //     setCsrfToken(token);
+    // }, []);
 
     // Function to handle form submission
     const handleSubmit = async (event) => {
@@ -33,12 +34,12 @@ const Form = () => {
         formData.append('query', query);
 
         try {
-            const response = await fetch('/upload/', {
+            const response = await fetch('http://localhost:8000/upload/', {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    'X-CSRFToken': csrfToken,
-                },
+                // headers: {
+                //     'X-CSRFToken': csrfToken,
+                // },
             });
 
             const result = await response.json();
@@ -49,7 +50,8 @@ const Form = () => {
             console.log(query);
 
             // Redirect to results page
-            window.location.href = `/results/${resultsId}/${query}/`;
+            navigate(`/results/${resultsId}/${query}/`)
+            // window.location.href = `http://localhost:8000/results/${resultsId}/${query}/`;
         } catch (error) {
             console.error('Error:', error);
         } finally {

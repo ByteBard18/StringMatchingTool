@@ -1,25 +1,19 @@
 import asyncio
-from concurrent.futures import ThreadPoolExecutor
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.core.files.storage import default_storage
-from .utils import process_text_file, use_bm25, get_lines  # Import the async processing function
-import uuid  # For generating unique result IDs
+from asgiref.sync import sync_to_async
+from .models import FileProcessingResult
+from .utils import process_text_file, use_bm25, get_lines
+import uuid
 from .boyermoore import search
-
-# Initialize the thread pool executor
-executor = ThreadPoolExecutor()
-
-def save_session_sync(session, key, value):
-    """Synchronous function to save session data."""
-    session[key] = value
-    session.save()
 
 async def upload_files(request):
     if request.method == 'POST':
         files = request.FILES.getlist('files')
         query = request.POST.get('query')
-
+        print(len(files))
+        
         # Save files to media directory
         file_paths = []
         for file in files:
@@ -34,19 +28,22 @@ async def upload_files(request):
         # Generate a unique results ID
         results_id = str(uuid.uuid4())
         
-        # Save results to the session using threading
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(executor, save_session_sync, request.session, results_id, results)
+        # Save results to the database using sync_to_async
+        await sync_to_async(FileProcessingResult.objects.create)(
+            result_id=results_id, query=query, results=results
+        )
+        print("Results saved to database")
 
         # Return the results ID to the client
         return JsonResponse({'results_id': results_id, 'query': query})
 
-    return render(request, 'my-react-app/index.html')
-
+    return render(request, 'upload.html')
 
 def get_results(request, results_id, query):
-    # Fetch results from session
-    results = request.session.get(results_id, [])    
+    # Fetch results from the database
+    result_record = get_object_or_404(FileProcessingResult, result_id=results_id)
+    results = result_record.results
+
     docs = use_bm25(results, query)
     response = []
     for doc in docs['result']:
@@ -59,7 +56,8 @@ def get_results(request, results_id, query):
                 'content': content,
                 'query': query,
                 'offset_list': offset_list,
-                'lines': lines
+                'lines': lines['results'],
+                'line_offsets': lines['offsets']
             })
         else:
             response.append({
@@ -68,10 +66,9 @@ def get_results(request, results_id, query):
                 'content': doc['content'],
                 'query': query
             })
-    #clear session after the code execution finishes
-    print("Session cleared")
-    request.session.pop(results_id, None)
+    # #clear session after the code execution finishes
+    # print("Session cleared")
+    # request.session.pop(results_id, None)
     
     #return render(request, "file_handler/results.html", {"results": results})
     return JsonResponse(response, safe=False)
-

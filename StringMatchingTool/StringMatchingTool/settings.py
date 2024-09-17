@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'search_handler',
-    
+    'corsheaders'
 ]
 
 CORS_ALLOWED_ORIGINS = ['http://localhost/5173/']
@@ -52,25 +52,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'StringMatchingTool.urls'
 
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(SETTINGS_PATH, 'static/')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Add the frontend origin here
 ]
 
 ASGI_APPLICATION = 'StringMatchingTool.asgi.application'
@@ -123,13 +112,29 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(SETTINGS_PATH, 'static/'), os.path.join(SETTINGS_PATH, 'search_handler/templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(SETTINGS_PATH, 'static/'),
+    os.path.join(BASE_DIR, 'static'),  # Path to your static files
 ]
 
-STATIC_ROOT = os.path.join(SETTINGS_PATH, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # For collectstatic command
 
 # URL to use when referring to media files
 MEDIA_URL = '/media/'
@@ -141,3 +146,7 @@ MEDIA_ROOT = os.path.join(SETTINGS_PATH, 'media')
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SESSION_COOKIE_SAMESITE = 'None'  # Allows cross-site cookies
+SESSION_COOKIE_SECURE = True       # Cookies are only sent over HTTPS (make sure your site uses HTTPS)
+

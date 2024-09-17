@@ -45,36 +45,36 @@ def preprocess_text(text):
 
 def use_bm25(corpus, query):
     tokenized_corpus = [doc['content'].split(" ") for doc in corpus]
-    bm25 = BM25Okapi(tokenized_corpus)
+    # bm25 = BM25Okapi(tokenized_corpus)
     
-    tokenized_query = query.split(" ")
+    # tokenized_query = query.split(" ")
     
-    doc_scores = bm25.get_scores(tokenized_query)
-    scores = doc_scores.tolist()
-    count_relevant = sum(1 for score in scores if score!=0)
-    res = bm25.get_top_n(tokenized_query, corpus, n=count_relevant)
-    return {'result': res}
-    # return {'result': corpus, 'scores': scores, 'query': tokenized_query}
+    # doc_scores = bm25.get_scores(tokenized_query)
+    # scores = doc_scores.tolist()
+    # count_relevant = sum(1 for score in scores if score!=0)
+    # res = bm25.get_top_n(tokenized_query, corpus, n=count_relevant)
+    # return {'result': res}
+    return {'result': corpus}
 
 def get_lines(content, offsets):
     offset_flag = False
     line_start = 0
-    stack = []
     results = []
-    for i in range(0, len(content)):
-        if(i==0):
-            stack.append(i)
-        if i in offsets:
-            offset_flag = True
-        if(content[i]=='.' or i==len(content)-1):
-            if(offset_flag==True and len(stack)>0):
-                line = content[line_start:i+1]
-                results.append({
-                    # 'id': content.id,
-                    'line': line,
-                })
-            line_start = i+1
-            stack = []
-            stack.append(i+1)
+    line_offset  = []
+    # Ensure offsets are in a set for faster lookup
+    offsets_set = set(offsets)
+    
+    for i in range(len(content)):
+        if content[i] == '.' or i == len(content) - 1:
+            # Check if there is an offset in the current line
+            if offset_flag:
+                line = content[line_start:i + 1].strip()
+                results.append(line)
+            line_start = i + 1
             offset_flag = False
-    return results
+        
+        if i in offsets_set:
+            offset_flag = True
+            line_offset.append(i-line_start)
+    
+    return {'results':results, 'offsets':line_offset}
