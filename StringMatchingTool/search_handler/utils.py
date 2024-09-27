@@ -45,16 +45,16 @@ def preprocess_text(text):
 
 def use_bm25(corpus, query):
     tokenized_corpus = [doc['content'].split(" ") for doc in corpus]
-    # bm25 = BM25Okapi(tokenized_corpus)
+    bm25 = BM25Okapi(tokenized_corpus)
     
-    # tokenized_query = query.split(" ")
+    tokenized_query = query.split(" ")
     
-    # doc_scores = bm25.get_scores(tokenized_query)
-    # scores = doc_scores.tolist()
-    # count_relevant = sum(1 for score in scores if score!=0)
-    # res = bm25.get_top_n(tokenized_query, corpus, n=count_relevant)
-    # return {'result': res}
-    return {'result': corpus}
+    doc_scores = bm25.get_scores(tokenized_query)
+    scores = doc_scores.tolist()
+    count_relevant = sum(1 for score in scores if score!=0)
+    res = bm25.get_top_n(tokenized_query, corpus, n=count_relevant)
+    return {'result': res}
+    # return {'result': corpus}
 
 def get_lines(content, offsets):
     offset_flag = False

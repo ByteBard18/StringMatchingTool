@@ -45,6 +45,7 @@ def get_results(request, results_id, query):
     results = result_record.results
 
     docs = use_bm25(results, query)
+    print(docs)
     response = []
     for doc in docs['result']:
         if(search(doc['content'], query)!=None):
@@ -66,9 +67,4 @@ def get_results(request, results_id, query):
                 'content': doc['content'],
                 'query': query
             })
-    # #clear session after the code execution finishes
-    # print("Session cleared")
-    # request.session.pop(results_id, None)
-    
-    #return render(request, "file_handler/results.html", {"results": results})
     return JsonResponse(response, safe=False)
