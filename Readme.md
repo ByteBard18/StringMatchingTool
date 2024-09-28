@@ -137,9 +137,9 @@ Make sure you have the following installed on your machine:
 
 ```bash
 
-git  clone  https://github.com/your-repo/string-matching-tool.git
+git clone https://github.com/ByteBard18/StringMatchingTool.git
 
-cd  string-matching-tool
+cd string-matching-tool
 
 ```
 
@@ -147,9 +147,9 @@ cd  string-matching-tool
 
 ```bash
 
-cd  frontend
+cd frontend
 
-npm  install
+npm install
 
 ```
 
@@ -157,9 +157,9 @@ npm  install
 
 ```bash
 
-cd  ../backend
+cd ../backend
 
-pip  install  -r  requirements.txt  # Install all the dependencies
+pip install -r requirements.txt  # Install all the dependencies
 
 ```
 
@@ -167,7 +167,7 @@ pip  install  -r  requirements.txt  # Install all the dependencies
 
 ```bash
 
-python  manage.py  createsuperuser
+python manage.py createsuperuser
 
 ```
 
@@ -187,9 +187,9 @@ Apply migrations and start the Django development server.
 
 ```bash
 
-python  manage.py  migrate
+python manage.py migrate
 
-python  manage.py  runserver
+python manage.py runserver
 
 ```
 
@@ -203,9 +203,9 @@ In another terminal, navigate to the frontend directory and run the React app:
 
 ```bash
 
-cd  frontend
+cd frontend
 
-npm  run  dev
+npm run dev
 
 ```
 
